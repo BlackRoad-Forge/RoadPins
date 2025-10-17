@@ -324,3 +324,95 @@ Sources:
 [Raspberry Pi 5 Pinouts](https://community.element14.com/products/raspberry-pi/m/files/148385)
 
 RP1 is a peripheral controller, designed by Raspberry Pi for use on Raspberry Pi 5. It connects to an application processor (AP),the 16nm Broadcom BCM2712, via a PCIe 2.0 x4 bus, and aggregates many digital controllers and analog PHYs for Raspberry Pi 5’s external interfaces.
+
+
+---
+
+## Python GPIO Libraries on Raspberry Pi 5
+
+The widely-used `RPi.GPIO` library is **not compatible** with the Raspberry Pi 5 and will not work.
+
+This is due to the new RP1 I/O controller chip, which changes how GPIO pins are accessed at a low level. Attempting to use `RPi.GPIO` will result in an error.
+
+The officially recommended Python libraries for controlling GPIO on the Raspberry Pi 5 are **GPIO Zero** (for beginners and most use cases) and **gpiod** (for intermediate/advanced use).
+
+### 1. GPIO Zero (Recommended for Most Users)
+
+**GPIO Zero** is a high-level, beginner-friendly library that represents components as objects (like `LED`, `Button`, `Motor`). It is pre-installed on Raspberry Pi OS and has been updated to work seamlessly with the Pi 5 by using a compatible backend (`lgpio`) automatically.
+
+**Example: Blink an LED on GPIO 17**
+
+```python
+from gpiozero import LED
+from time import sleep
+
+# Use GPIO pin 17 (physical pin 11)
+led = LED(17)
+
+print("Press Ctrl+C to exit")
+try:
+    while True:
+        led.on()    # Turn the LED on
+        sleep(1)
+        led.off()   # Turn the LED off
+        sleep(1)
+except KeyboardInterrupt:
+    print("\nExiting...")
+    led.close()
+```
+
+### 2. gpiod (Lower-Level Control)
+
+For users who need more direct, lower-level control similar to what `RPi.GPIO` provided, the modern library to use is **gpiod**. It is the standard, kernel-supported way to interact with GPIO pins on Linux.
+
+**Installation:**
+```bash
+sudo apt update
+sudo apt install python3-gpiod
+```
+
+**Example: Blink an LED on GPIO 17**
+
+Note that the code is more verbose, as it provides more direct control. On the Raspberry Pi 5, the GPIO pins are on `gpiochip4`.
+
+```python
+import gpiod
+import time
+
+# On Raspberry Pi 5, the GPIO pins are on chip 4
+CHIP = 'gpiochip4'
+LED_LINE = 17 # Use GPIO pin 17
+
+# Request the chip and the specific GPIO line
+chip = gpiod.Chip(CHIP)
+led_line = chip.get_line(LED_LINE)
+
+# Configure the line as an output
+led_line.request(consumer="my-led", type=gpiod.LINE_REQ_DIR_OUT)
+
+print("Press Ctrl+C to exit")
+try:
+    while True:
+        led_line.set_value(1) # Turn the LED on
+        time.sleep(1)
+        led_line.set_value(0) # Turn the LED off
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("\nExiting...")
+finally:
+    # Release the line so other programs can use it
+    led_line.release()
+```
+# Amazon Links:
+
+8gb board:
+https://amzn.to/4o7dBUU
+
+16gb board:
+https://amzn.to/4qbC9Oh
+
+Official heatsink:
+https://amzn.to/3KRpu2R
+
+Upgraded geekworm heatsink:
+https://amzn.to/499peGl
