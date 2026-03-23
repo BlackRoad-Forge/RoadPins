@@ -1,3 +1,11 @@
+# RoadPins
+
+> Raspberry Pi 5 GPIO pinout reference
+
+Part of the [BlackRoad OS](https://blackroad.io) ecosystem. Forked from [`Felipegalind0/RPI5.pinout`](https://github.com/Felipegalind0/RPI5.pinout).
+
+---
+
 
 # Raspberry Pi 5 Pinout
 
@@ -357,7 +365,8 @@ try:
         led.off()   # Turn the LED off
         sleep(1)
 except KeyboardInterrupt:
-    print("\nExiting...")
+    print("
+Exiting...")
     led.close()
 ```
 
@@ -398,7 +407,8 @@ try:
         led_line.set_value(0) # Turn the LED off
         time.sleep(1)
 except KeyboardInterrupt:
-    print("\nExiting...")
+    print("
+Exiting...")
 finally:
     # Release the line so other programs can use it
     led_line.release()
